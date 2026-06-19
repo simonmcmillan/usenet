@@ -1,0 +1,131 @@
+services:
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/sabnzbd:/config:Z
+      - ${MEDIA_ROOT}/data:/data:z
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/prowlarr:/config:Z
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/sonarr:/config:Z
+      - ${MEDIA_ROOT}/data:/data:z
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/radarr:/config:Z
+      - ${MEDIA_ROOT}/data:/data:z
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/bazarr:/config:Z
+      - ${MEDIA_ROOT}/data:/data:z   # same /data as radarr/sonarr → paths match 1:1
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/jellyfin:/config:Z
+      - ${MEDIA_ROOT}/data/media:/data/media:z
+    ports:
+      - 8096:8096
+      - 7359:7359/udp  # local network discovery
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/jellyseerr:/app/config:Z
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET}
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_ROOT}/config/homarr-v1/appdata:/appdata:Z
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 7575:7575
+    restart: unless-stopped
+
+  dash:
+    image: mauricenino/dashdot:latest
+    container_name: dash
+    environment:
+      - TZ=${TZ}
+      - DASHDOT_ENABLE_CPU_TEMPS=false  # IT8686E has no Linux driver on this board
+    privileged: true
+    security_opt:
+      - label=disable                   # avoid SELinux relabel of host root mount
+    volumes:
+      - /:/mnt/host:ro,rslave
+    ports:
+      - 3001:3001
+    restart: unless-stopped

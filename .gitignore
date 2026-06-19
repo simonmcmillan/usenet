@@ -1,0 +1,11 @@
+# Per-service runtime state: SQLite DBs, caches, logs — and secrets
+# (API keys, provider passwords) baked into each service's config files.
+# Never commit this; it's ~1GB+ and machine-specific.
+config/
+
+# Local environment — contains real secrets (HOMARR_SECRET, paths).
+# Commit .env.example instead.
+.env
+
+# Local-only notes
+CLAUDE.md
