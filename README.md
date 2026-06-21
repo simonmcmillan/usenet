@@ -84,6 +84,18 @@ docker compose up -d
 docker compose ps
 ```
 
+### Accessing the apps
+
+Each service has a web UI you open in a browser at `http://localhost:<port>`
+(the ports are in the table at the top). For example:
+
+- Seerr (your main request UI): <http://localhost:5055>
+- Jellyfin (streaming): <http://localhost:8096>
+- SABnzbd, Prowlarr, Sonarr, Radarr, etc. on their respective ports.
+
+From another device on your network (phone, TV), swap `localhost` for the
+server's LAN IP, e.g. `http://192.168.1.50:8096`.
+
 Then open each service and wire it together (see below).
 
 > **SELinux note (Bazzite/Fedora):** the volume mounts in the compose file use
