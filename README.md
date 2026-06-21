@@ -45,9 +45,17 @@ You supply your own accounts — these are not included and not free:
    username, password, and connection count.
 2. **At least one Usenet indexer** (the search engine). E.g. NZBGeek,
    NZBPlanet, DrunkenSlug. You get an API key + URL.
-3. **Docker + the Compose plugin.** On a normal distro: install Docker Engine.
-   On Bazzite/atomic Fedora: `rpm-ostree install moby-engine docker-compose`
-   then reboot. (The `docker-compose-plugin` package is *not* available there.)
+3. **Docker + the Compose plugin.**
+   - **Ubuntu / Debian:** follow Docker's official guide to install Docker
+     Engine and the Compose plugin
+     (<https://docs.docker.com/engine/install/ubuntu/>). In short: add Docker's
+     apt repo, then
+     `sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin`.
+     Add yourself to the `docker` group (`sudo usermod -aG docker $USER`) and
+     log out/in so you can run `docker` without `sudo`.
+   - **Bazzite / atomic Fedora:** `rpm-ostree install moby-engine docker-compose`
+     then reboot. (The `docker-compose-plugin` package is *not* available
+     there.)
 
 > The Jellyfin service includes a `deploy:` block for GPU hardware
 > transcoding. If you don't have a supported GPU set up, delete that block to
@@ -64,9 +72,12 @@ cp .env.example .env
 $EDITOR .env                      # set PUID/PGID, TZ, paths, HOMARR_SECRET
 openssl rand -hex 32              # paste the result as HOMARR_SECRET
 
-# 2. Create the media tree on your big disk (match MEDIA_ROOT in .env)
-mkdir -p /var/mnt/storage/data/usenet/{complete,incomplete}
-mkdir -p /var/mnt/storage/data/media/{tv,movies}
+# 2. Create the media tree on your big disk (must match MEDIA_ROOT in .env).
+#    Replace the path below with your own — e.g. /mnt/storage on Ubuntu,
+#    or /var/mnt/storage on Bazzite.
+MEDIA_ROOT=/path/to/your/media/disk
+mkdir -p "$MEDIA_ROOT"/data/usenet/{complete,incomplete}
+mkdir -p "$MEDIA_ROOT"/data/media/{tv,movies}
 
 # 3. Bring it up
 docker compose up -d
