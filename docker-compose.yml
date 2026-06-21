@@ -82,6 +82,17 @@ services:
     ports:
       - 8096:8096
       - 7359:7359/udp  # local network discovery
+    # --- GPU hardware transcoding (optional) ---
+    # Passes an NVIDIA GPU into the container so Jellyfin can offload
+    # transcoding (NVENC/NVDEC) from the CPU. Requires the NVIDIA driver +
+    # NVIDIA Container Toolkit installed on the host.
+    #   - No GPU / don't want it? Delete this whole `deploy:` block to run
+    #     Jellyfin on the CPU only.
+    #   - Intel/AMD GPU instead? Remove this block and use the `devices:`
+    #     approach to pass /dev/dri (VAAPI/QSV) — see the Jellyfin hardware
+    #     acceleration docs.
+    #   - Note: older NVIDIA cards may encode but not decode newer codecs
+    #     (HEVC/AV1/Dolby Vision); check your card's support before relying on it.
     deploy:
       resources:
         reservations:
